@@ -8,11 +8,38 @@ function retUrl(params) {
     return baseUrl + Object.keys(params).map(key => key + '=' + params[key]).join('&');
 }
 
+function setupCard(cardID,hdrTxt){
+    let rowDiv=$("<div>");
+    rowDiv.addClass("row");
+
+    let colDiv=$("<div>");
+    colDiv.addClass("col-lg-12");
+    colDiv.appendTo(rowDiv);
+
+    let cardDiv=$("<div>");
+    cardDiv.addClass("card card-default");
+    cardDiv.attr("id",cardID);
+    cardDiv.appendTo(colDiv);
+
+    let cardHdr=$("<div>");
+    cardHdr.addClass("card-header");
+    cardHdr.text(hdrTxt);
+    cardHdr.appendTo(cardDiv);
+
+    let cardBody=$("<div>");
+    cardBody.addClass("card-body");
+    cardBody.appendTo(cardDiv);
+    return rowDiv;
+}
+
 $("#submit-query").on("click", function (event) {
     event.preventDefault();
     const location = $("#location").val().trim();
     const budget = $("#budget").val().trim();
     console.log('submit clicked', location, budget);
+
+    let imgCard=setupCard("flickr-card","snapshots");
+    imgCard.appendTo($(".container"));
 
     let params = {
         method: 'flickr.photos.search',
@@ -30,7 +57,6 @@ $("#submit-query").on("click", function (event) {
     };
     const queryURL = retUrl(params);
     console.log(queryURL);
-
     $.getJSON(queryURL, function (json) {
         console.log(json);
         let sizeParams = {
@@ -41,10 +67,10 @@ $("#submit-query").on("click", function (event) {
             format: 'json',
             nojsoncallback: '1'
         };
-        console.log(json.photos.photo);
-
-        let photoArr=json.photos.photo.slice(0,3);
-        photoArr.map(function (itm) {
+        let photoArr=json.photos.photo;
+        console.log(photoArr.length);
+        
+        photoArr.slice(5,10).map(function (itm) {
             console.log(itm)
             sizeParams.photo_id = itm.id;
             const queryURL_size = retUrl(sizeParams);
@@ -53,8 +79,17 @@ $("#submit-query").on("click", function (event) {
             $.getJSON(queryURL_size, function (results) {
                 // console.log(results);
                 // console.log(results.sizes.size[1].source);
-                const url = results.sizes.size[1].source;
-                $("#img-card-body").append('<p><a href="' + url + '" target="_blank"><img src="' + url + '"/></a></p>');
+                const url = results.sizes.size[1].source; // this line selects the image size
+                let div=$("<div>");
+                div.addClass("img-holder");
+                // div.attr("id","img-holder");
+                let img=$("<img>");
+                img.addClass("flickr-img");
+                img.attr("src",url);
+                div.append(img);
+                // img.appendTo($("#img-holder"));
+                div.appendTo($("#flickr-card .card-body"));
+                // $("#img-card-body").append('<p><a href="' + url + '" target="_blank"><img src="' + url + '"/></a></p>');
             });
         });
     });

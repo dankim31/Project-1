@@ -16,7 +16,9 @@ body {
     background-color: #333333;
     color:#dddddd;
 }
-
+.img-holder{
+    margin: 1rem auto;
+}
 /* style for body, spacing */
 /* style for search bar */
 /* style for currency conversion section */
