@@ -1,16 +1,24 @@
 body {
-    background-image: url("../images/wallpaper.jpg");
+    background-image: url("../assets/images/wallpaper.jpg");
     background-position: center;
     background-attachment: fixed;
 }
 
+.jumbotron{
+    background-color: darkred;
+    color:lightgray;
+    margin: 1rem auto;
+}
+.card{
+    margin: 1rem auto;
+}
+.card-header{
+    background-color: #333333;
+    color:#dddddd;
+}
 
 /* style for body, spacing */
-
 /* style for search bar */
-
 /* style for currency conversion section */
-
 /* style for images */
-
 /* style for yelp information box */
