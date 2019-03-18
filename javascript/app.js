@@ -11,6 +11,7 @@ function retUrl(params) {
 function setupCard(cardID, hdrTxt) {
     let rowDiv = $("<div>");
     rowDiv.addClass("row");
+    rowDiv.attr("id","row-"+cardID);
 
     let colDiv = $("<div>");
     colDiv.addClass("col-lg-12");
@@ -28,20 +29,31 @@ function setupCard(cardID, hdrTxt) {
 
     let cardBody = $("<div>");
     cardBody.addClass("card-body");
+    cardBody.attr({
+        display: "flex",
+        'flex-direction': "row",
+        'flex-wrap': "wrap",
+        'justify-content': 'space-evenly',
+        'align-items': 'center'
+    });
     cardBody.appendTo(cardDiv);
     return rowDiv;
 }
 
 $("#submit-query").on("click", function (event) {
+    // init setup, get user input
     event.preventDefault();
     const location = $("#location").val().trim();
     const budget = $("#budget").val().trim();
     console.log('submit clicked', location, budget);
 
-    let imgCard = setupCard("flickr-card", "snapshots");
+    // setup html section for flickr output, cardID and headerText
+    $("#row-flickr-card").remove(); // clear whole row of flickr if it exists.
+    let imgCard = setupCard("flickr-card", "Glimpse");
     imgCard.appendTo($(".container"));
 
-    let params = {
+    // API call to flickr to search images
+    const params = {
         method: 'flickr.photos.search',
         api_key: flickrKey,
         media: "photos",
@@ -59,42 +71,69 @@ $("#submit-query").on("click", function (event) {
     console.log(queryURL);
     $.getJSON(queryURL, function (json) {
         console.log(json);
-        let sizeParams = {
-            method: 'flickr.photos.getSizes',
-            api_key: flickrKey,
-            photo_id: '',
-            per_page: '20',
-            format: 'json',
-            nojsoncallback: '1'
-        };
         let photoArr = json.photos.photo;
-        console.log(photoArr.length);
+        console.log(photoArr); // array of object, length 100
 
-        photoArr.slice(5, 10).map(function (itm) {
-            console.log(itm)
-            sizeParams.photo_id = itm.id;
+        const lst = [0, 5, 10, 15];
+        const idx = lst.map(function (itm) { return Math.floor(Math.random() * 5) + itm });
+        idx.forEach(function (ind) {
+            itm = photoArr[ind];
+            const sizeParams = {
+                method: 'flickr.photos.getSizes',
+                api_key: flickrKey,
+                photo_id: itm.id,
+                per_page: '20',
+                format: 'json',
+                nojsoncallback: '1'
+            };
+            // sizeParams.photo_id = itm.id;
             const queryURL_size = retUrl(sizeParams);
             // const selected_size = 240;
-
             $.getJSON(queryURL_size, function (results) {
-                // console.log(results);
-                // console.log(results.sizes.size[1].source);
-                const url = results.sizes.size[1].source; // this line selects the image size
-                let div = $("<div>");
-                div.addClass("img-holder");
-                // div.attr("id","img-holder");
+                // this line selects the image size
+                const url = results.sizes.size[1].source;
+
                 let img = $("<img>");
                 img.addClass("flickr-img");
                 img.attr("src", url);
-                div.append(img);
-                // img.appendTo($("#img-holder"));
-                div.appendTo($("#flickr-card .card-body"));
-                // $("#img-card-body").append('<p><a href="' + url + '" target="_blank"><img src="' + url + '"/></a></p>');
+                img.appendTo("#flickr-card .card-body");
             });
+            /*
+            photoArr.slice(1, 5).map(function (itm) {
+                console.log(itm)
+                const sizeParams = {
+                    method: 'flickr.photos.getSizes',
+                    api_key: flickrKey,
+                    photo_id: itm.id,
+                    per_page: '20',
+                    format: 'json',
+                    nojsoncallback: '1'
+                };
+                // sizeParams.photo_id = itm.id;
+                const queryURL_size = retUrl(sizeParams);
+                // const selected_size = 240;
+                $.getJSON(queryURL_size, function (results) {
+                    // console.log(results);
+                    // console.log(results.sizes.size[1].source);
+                    const url = results.sizes.size[1].source; // this line selects the image size
+
+                    // let div = $("<div>");
+                    // div.addClass("img-holder");
+
+                    // div.attr("id","img-holder");
+                    let img = $("<img>");
+                    img.addClass("flickr-img");
+                    img.attr("src", url);
+                    img.appendTo("#flickr-card .card-body");
+
+                    // div.append(img);
+                    // img.appendTo($("#img-holder"));
+                    // div.appendTo($("#flickr-card .card-body"));
+                    // $("#img-card-body").append('<p><a href="' + url + '" target="_blank"><img src="' + url + '"/></a></p>');
+                });*/
+            });            
         });
     });
-
-})
 
 // $(document).ready(function() {
 //     console.log('hello');
@@ -108,4 +147,4 @@ $("#submit-query").on("click", function (event) {
 //     // function for ajax call to image api //
 
 //     // function for ajax call to yelp api //
-// });
+// })
