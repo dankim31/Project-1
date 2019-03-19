@@ -177,20 +177,8 @@ class UI {
     // const searchCategory = document.getElementById('searchCategory');
 
     const zomato = new ZOMATO();
-
     const ui = new UI();
 
-/* 
-    //add select options
-    document.addEventListener('DOMContentLoaded', () => {
-        //logic goes here
-        zomato.searchAPI().then(data => {
-            ui.addSelectOptions(data.categories);
-            console.log(data.categories);
-        });
-        // ui.addSelectOptions()
-    });
- */
     //sumbit form
     searchForm.addEventListener('submit', event => {
         event.preventDefault();
