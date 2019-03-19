@@ -171,26 +171,33 @@ class UI {
     }
 }
 (function () {
+    // console.log('zomato.js running') // check if loaded correctly
     const searchForm = document.getElementById('searchForm');
     const searchCity = document.getElementById('searchCity');
-    const searchCategory = document.getElementById('searchCategory');
+    // const searchCategory = document.getElementById('searchCategory');
 
     const zomato = new ZOMATO();
 
     const ui = new UI();
 
+/* 
     //add select options
     document.addEventListener('DOMContentLoaded', () => {
         //logic goes here
-        zomato.searchAPI().then(data => ui.addSelectOptions(data.categories));
+        zomato.searchAPI().then(data => {
+            ui.addSelectOptions(data.categories);
+            console.log(data.categories);
+        });
+        // ui.addSelectOptions()
     });
-
+ */
     //sumbit form
     searchForm.addEventListener('submit', event => {
         event.preventDefault();
 
         const city = searchCity.value.toLowerCase();
-        const categoryID = parseInt(searchCategory.value);
+        // const categoryID = parseInt(searchCategory.value);
+        const categoryID = 9; // lunch
 
         if (city === '' || categoryID === 0) {
             ui.showFeedback('please enter a city and select category');
