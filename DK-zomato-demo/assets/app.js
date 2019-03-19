@@ -136,12 +136,18 @@ class UI {
         console.log(restaurants);
         const costArr = restaurants.map(item => {
             const costItm = item.restaurant.average_cost_for_two;
-            console.log(costItm);
+            // console.log(costItm);
             return costItm;
         });
+        console.log(costArr);
         let costAvg = costArr.reduce((total, itm) => { return total + itm }, 0);
         costAvg /= costArr.length;
         console.log(costAvg);
+
+        let cuisineArr=restaurants.map(item=>{
+            return item.restaurant.cuisines;
+        });
+        console.log(cuisineArr);
     }
 }
 (function () {
