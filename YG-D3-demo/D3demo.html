@@ -34,117 +34,52 @@
     <!-- <h1>hello</h1> -->
     <script src="code.js"></script>
     <script>
-        var color = "steelblue";
+        var data = [
+            79, 54, 74, 62, 85, 55, 88, 85, 51, 85, 54, 84, 78, 47, 83, 52, 62, 84, 52, 79, 51, 47, 78, 69, 74, 83, 55, 76, 78, 79, 73, 77, 66, 80, 74, 52, 48, 80, 59, 90, 80, 58, 84, 58, 73, 83, 64, 53,
+            82, 59, 75, 90, 54, 80, 54, 83, 71, 64, 77, 81, 59, 84, 48, 82, 60, 92, 78, 78, 65, 73, 82, 56, 79, 71, 62, 76, 60, 78, 76, 83, 75, 82, 70, 65, 73, 88, 76, 80, 48, 86, 60, 90, 50, 78, 63, 72,
+            84, 75, 51, 82, 62, 88, 49, 83, 81, 47, 84, 52, 86, 81, 75, 59, 89, 79, 59, 81, 50, 85, 59, 87, 53, 69, 77, 56, 88, 81, 45, 82, 55, 90, 45, 83, 56, 89, 46, 82, 51, 86, 53, 79, 81, 60, 82, 77,
+            76, 59, 80, 49, 96, 53, 77, 77, 65, 81, 71, 70, 81, 93, 53, 89, 45, 86, 58, 78, 66, 76, 63, 88, 52, 93, 49, 57, 77, 68, 81, 81, 73, 50, 85, 74, 55, 77, 83, 83, 51, 78, 84, 46, 83, 55, 81, 57,
+            76, 84, 77, 81, 87, 77, 51, 78, 60, 82, 91, 53, 78, 46, 77, 84, 49, 83, 71, 80, 49, 75, 64, 76, 53, 94, 55, 76, 50, 82, 54, 75, 78, 79, 78, 78, 70, 79, 70, 54, 86, 50, 90, 54, 54, 77, 79, 64,
+            75, 47, 86, 63, 85, 82, 57, 82, 67, 74, 54, 83, 73, 73, 88, 80, 71, 83, 56, 79, 78, 84, 58, 83, 43, 60, 75, 81, 46, 90, 46, 74
+        ];
 
-        // Generate a 1000 data points using normal distribution with mean=20, deviation=5
-        // var values = d3.range(1000).map(d3.random.normal(20, 5));
-        var values = d3.range(1000).map(d3.randomNormal(20, 5));
+        var width = 952;
+        var height = 476;
+        var x = d3.scaleLinear().domain([30, 110]).range([0, width]);
 
-        // A formatter for counts.
-        var formatCount = d3.format(",.0f");
+        var bins = d3.histogram().domain(x.domain()).thresholds(x.ticks(30))(data);
 
-        var margin = { top: 20, right: 30, bottom: 30, left: 30 },
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
+        var max = d3.max(bins, function (d) {
+            return d.y;
+        });
 
-        var max = d3.max(values);
-        var min = d3.min(values);
-        var x = d3.scaleLinear()
-            .domain([min, max])
-            .range([0, width]);
+        var y = d3.scaleLinear().domain([0, .1]).range([0, height]);
 
-        // Generate a histogram using twenty uniformly-spaced bins.
-        var data = d3.histogram().bins(x.ticks(20))
-            (values);
-
-        var yMax = d3.max(data, function (d) { return d.length });
-        var yMin = d3.min(data, function (d) { return d.length });
-        var colorScale = d3.scaleLinear()
-            .domain([yMin, yMax])
-            .range([d3.rgb(color).brighter(), d3.rgb(color).darker()]);
-
-        var y = d3.scaleLinear()
-            .domain([0, yMax])
+        var yForHistogram = d3.scaleLinear()
+            .domain([0, d3.max(bins, function (d) {
+                return d.length;
+            })])
             .range([height, 0]);
 
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
+        var vis = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
 
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        var bar = svg.selectAll(".bar")
-            .data(data)
+        var bars = vis.selectAll("g.bar")
+            .data(bins)
             .enter().append("g")
             .attr("class", "bar")
-            .attr("transform", function (d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+            .attr("transform", function (d) {
+                return "translate(" + x(d.x0) + "," + yForHistogram(d.length) + ")";
+            });
 
-        bar.append("rect")
-            .attr("x", 1)
-            .attr("width", (x(data[0].dx) - x(0)) - 1)
-            .attr("height", function (d) { return height - y(d.y); })
-            .attr("fill", function (d) { return colorScale(d.y) });
-
-        bar.append("text")
-            .attr("dy", ".75em")
-            .attr("y", -12)
-            .attr("x", (x(data[0].dx) - x(0)) / 2)
-            .attr("text-anchor", "middle")
-            .text(function (d) { return formatCount(d.y); });
-
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        /*
-        * Adding refresh method to reload new data
-        */
-        function refresh(values) {
-            // var values = d3.range(1000).map(d3.random.normal(20, 5));
-            var data = d3.layout.histogram()
-                .bins(x.ticks(20))
-                (values);
-
-            // Reset y domain using new data
-            var yMax = d3.max(data, function (d) { return d.length });
-            var yMin = d3.min(data, function (d) { return d.length });
-            y.domain([0, yMax]);
-            var colorScale = d3.scaleLinear()
-                .domain([yMin, yMax])
-                .range([d3.rgb(color).brighter(), d3.rgb(color).darker()]);
-
-            var bar = svg.selectAll(".bar").data(data);
-
-            // Remove object with data
-            bar.exit().remove();
-
-            bar.transition()
-                .duration(1000)
-                .attr("transform", function (d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-
-            bar.select("rect")
-                .transition()
-                .duration(1000)
-                .attr("height", function (d) { return height - y(d.y); })
-                .attr("fill", function (d) { return colorScale(d.y) });
-
-            bar.select("text")
-                .transition()
-                .duration(1000)
-                .text(function (d) { return formatCount(d.y); });
-        }
-
-        // Calling refresh repeatedly.
-        setInterval(function () {
-            var values = d3.range(1000).map(d3.random.normal(20, 5));
-            refresh(values);
-        }, 2000);
-
+        bars.append("rect")
+            .attr("fill", "steelblue")
+            .attr("width", x(bins[0].x1) - x(bins[0].x0) - 1)
+            .attr("height", function (d) {
+                return height - yForHistogram(d.length);
+            });
     </script>
 </body>
 
