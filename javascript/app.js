@@ -60,7 +60,10 @@ class ZOMATO {
 
 class UI {
     constructor() {
-        this.restaurantList = document.getElementById('restaurant-list');
+        // this.restaurantList = document.getElementById('restaurant-list');
+        this.restaurantList = document
+            .getElementById('row-zomato-card')
+            .getElementsByClassName('card-body');
     }
     addSelectOptions(categories) {
         const search = document.getElementById('searchCategory');
@@ -87,8 +90,13 @@ class UI {
         else {
             this.restaurantList.innerHTML = '';
             restaurants.forEach((restaurant) => {
-                const { thumb: img, name, location: { address }, user_rating: { aggregate_rating }, cuisines, average_cost_for_two: cost, menu_url, url } =
-                    restaurant.restaurant;
+                const { thumb: img,
+                    name,
+                    location: { address },
+                    user_rating: { aggregate_rating },
+                    cuisines,
+                    average_cost_for_two: cost,
+                    menu_url, url } = restaurant.restaurant;
                 if (img !== '') {
                     this.showRestaurant(img, name, address, aggregate_rating, cuisines, cost, menu_url, url)
                 }
@@ -97,17 +105,17 @@ class UI {
     }
     showRestaurant(img, name, address, aggregate_rating, cuisines, cost, menu_url, url) {
         const div = document.createElement('div');
-        div.classList.add('col-11', 'mx-auto', 'my-3', 'col-md-4');
+        div.classList.add('col-lg-3', 'mx-auto', 'my-3', 'col-md-4', 'col-sm-8'); //'mx-auto'
 
-        div.innerHTML = `<div class="card">
+        div.innerHTML = `
         <div class="card">
          <div class="row p-3">
-          <div class="col-5">
+          <div class="col-12">
           <img src="${img}" class="img-fluid img-thumbnail" alt="">  
           </div>
-          <div class="col-5 text-capitalize">
+          <div class="col-9 text-capitalize">
            <h6 class="text-uppercase pt-2 redText">${name}</h6>
-           <p>${address}</p>
+           <span>${address}</span>
           </div>
           <div class="col-1">
            <div class="badge badge-success">
@@ -116,32 +124,52 @@ class UI {
           </div>
          </div>
          <hr>
-         <div class="row py-3 ml-1">
-          <div class="col-5 text-uppercase ">
+         <div class="row py-1 ml-1">
+          <div class="col-6 text-uppercase ">
            <p>cousines :</p>
+          </div>
+          <div class="col-6 text-uppercase ">
+           <p>${cuisines}</p>
+          </div>
+         </div>
+         <div class="row py-1 ml-1">
+          <div class="col-7 text-uppercase ">
            <p>cost for two :</p>
           </div>
-          <div class="col-7 text-uppercase">
-           <p>${cuisines}</p>
+          <div class="col-4 text-uppercase">
            <p>${cost}</p>
           </div>
          </div>
          <hr>
-         <div class="row text-center no-gutters pb-3">
+         <div class="row text-center no-gutters pb-2">
           <div class="col-6">
            <a href="${menu_url}" target="_blank" class="btn redBtn  text-uppercase"><i class="fas fa-book"></i> menu</a>
           </div>
           <div class="col-6">
            <a href="${url}" target="_blank" class="btn redBtn  text-uppercase"><i class="fas fa-book"></i> website</a>
-          </div>
          </div>
-        </div>`;
-        this.restaurantList.appendChild(div);
+         </div>`;
+        // console.log(this.restaurantList);
+        // this.restaurantList.appendChild(div); // weird problem here
+        $(this.restaurantList).append(div);
+    }
+    calcAvgCost(restaurants) {
+        // do the aggregation in this function, adapt the html template from the function above.
+        console.log("calcAvgCost called");
+        const costArr = restaurants.map(item => {
+            const costItm = item.restaurant.average_cost_for_two;
+            // console.log(costItm);
+            return costItm;
+        });
+        console.log(costArr);
+        let costAvg = costArr.reduce((total, itm) => { return total + itm }, 0);
+        costAvg /= costArr.length;
+        console.log(costAvg);
+        return costAvg;
     }
     showSnapshot(restaurants) {
         // do the aggregation in this function, adapt the html template from the function above.
         console.log("showSnapshot called");
-        console.log(restaurants);
         const costArr = restaurants.map(item => {
             const costItm = item.restaurant.average_cost_for_two;
             // console.log(costItm);
@@ -177,7 +205,6 @@ class UI {
         this.restaurantList.appendChild(div);
     }
 }
-
 // ---- zomato setup end ----
 
 
@@ -285,8 +312,15 @@ function genCardZomato(location) {
     const city = location.toLowerCase();
     const categoryID = 9; // lunch
 
-    $("#zomato-card .card-body").text(location);
-    
+    // $("#zomato-card .card-body").text(location);
+    // const temp = document.getElementById('zomato-card')
+    //     .getElementsByClassName('card-body');
+    // console.log(temp);
+    zomato.searchAPI(city, categoryID).then(data => {
+        ui.getRestaurants(data.restaurants.splice(0, 3));
+        const avgCost = ui.calcAvgCost(data.restaurants);
+        // $("#zomato-card .card-body").text(avgCost);
+    });
 }
 
 $("#submit-query").on("click", function (event) {
