@@ -130,10 +130,18 @@ class UI {
         </div>`;
         this.restaurantList.appendChild(div);
     }
-    showSnapshot(restaurants){
+    showSnapshot(restaurants) {
         // do the aggregation in this function, adapt the html template from the function above.
         console.log("showSnapshot called");
         console.log(restaurants);
+        const costArr = restaurants.map(item => {
+            const costItm = item.restaurant.average_cost_for_two;
+            console.log(costItm);
+            return costItm;
+        });
+        let costAvg = costArr.reduce((total, itm) => { return total + itm }, 0);
+        costAvg /= costArr.length;
+        console.log(costAvg);
     }
 }
 (function () {
