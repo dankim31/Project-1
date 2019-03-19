@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>Flickr Demo</title>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CDN-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+    <!-- Moment JS -->
+    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+</head>
+
+<body>
+    <!-- adapted from https://www.w3resource.com/API/flickr/tutorial.php -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2> Photo Size (px)</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary" id="sq">Square [75X75]</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary" id="lg-sq">Large Square [150X150]</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary" id="thumb">Thumbnail</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary" id="small">Small</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary" id="mid">Medium</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary" id="ori">Original</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <br>
+                <button type="button" class="btn btn-success" id="button">Fetch Recent Photos</button>
+                <hr>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./flickr_demo.js"></script>
+</body>
+
+</html>
