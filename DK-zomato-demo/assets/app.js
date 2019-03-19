@@ -1,93 +1,97 @@
 class ZOMATO {
-constructor() {
-    this.api = "8752afbbc3a9e1f17b88f62184d399b0";
-    this.header = {
-        method:'GET',
-        headers: {
-            'user-key':this.api,
-            'Content-Type':'application/json'
-        },
-        credentials:'same-origin'
-    };
-}
-async searchAPI(city,categoryID) {
-    //category url
-   const categoryURL = 'https://developers.zomato.com/api/v2.1/categories'; 
-    // city url
-    const cityURL = `https://developers.zomato.com/api/v2.1/cities?q=${city}`
-   //category data
-   const categoryInfo = await fetch(categoryURL,this.header);
-   const categoryJSON = await categoryInfo.json();
-   const categories = await categoryJSON.categories;
+    constructor() {
+        this.api = "8752afbbc3a9e1f17b88f62184d399b0";
+        this.header = {
+            method: 'GET',
+            headers: {
+                'user-key': this.api,
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        };
+    }
+    async searchAPI(city, categoryID) {
+        //category url
+        const categoryURL = 'https://developers.zomato.com/api/v2.1/categories';
+        // city url
+        const cityURL = `https://developers.zomato.com/api/v2.1/cities?q=${city}`
+        //category data
+        const categoryInfo = await fetch(categoryURL, this.header);
+        const categoryJSON = await categoryInfo.json();
+        const categories = await categoryJSON.categories;
 
-//search city
+        //search city
 
-const cityInfo = await fetch(cityURL,this.header);
-const cityJSON = await cityInfo.json();
-const cityLocation = await cityJSON.location_suggestions;
+        const cityInfo = await fetch(cityURL, this.header);
+        // console.log(cityInfo);
+        const cityJSON = await cityInfo.json();
+        // console.log(cityJSON);
+        const cityLocation = await cityJSON.location_suggestions;
+        // console.log(cityLocation);
 
-let cityID = 0;
+        let cityID = 0;
 
-if(cityLocation.length>0){
-    cityID = await cityLocation[0].id
-}
+        if (cityLocation.length > 0) {
+            cityID = await cityLocation[0].id
+        }
+        // console.log(cityID);
 
-// search restaurant 
-const restaurantURL = `https://developers.zomato.com/api/v2.1/search?entity_id=${cityID}&entity_type=city&category=${categoryID}&sort=rating`;
-const restaurantInfo = await fetch(restaurantURL,this.header)
-const restaurantJSON = await restaurantInfo.json();
-const restaurants = await restaurantJSON.restaurants;
+        // search restaurant 
+        const restaurantURL = `https://developers.zomato.com/api/v2.1/search?entity_id=${cityID}&entity_type=city&category=${categoryID}&sort=rating`;
+        const restaurantInfo = await fetch(restaurantURL, this.header)
+        const restaurantJSON = await restaurantInfo.json();
+        const restaurants = await restaurantJSON.restaurants;
+        // console.log(restaurants);
 
-   return {
-       categories,
-       cityID,
-       restaurants
-   };
-}
+        return {
+            categories,
+            cityID,
+            restaurants
+        };
+    }
 }
 
 class UI {
-constructor() {
-    this.restaurantList = document.getElementById('restaurant-list');
-}
-addSelectOptions(categories){
-    const search = document.getElementById('searchCategory');
-    let output = `<option value='0' selected>select category</option>`;
-    categories.forEach(category =>{
-        output += `<option value="${category.categories.id}">${category.categories.name}
+    constructor() {
+        this.restaurantList = document.getElementById('restaurant-list');
+    }
+    addSelectOptions(categories) {
+        const search = document.getElementById('searchCategory');
+        let output = `<option value='0' selected>select category</option>`;
+        categories.forEach(category => {
+            output += `<option value="${category.categories.id}">${category.categories.name}
         </option>`
-    })
-search.innerHTML = output;
-}
-showFeedback(text){
-    const feedback = document.querySelector('.feedback');
-    feedback.classList.add('showItem');
-    feedback.innerHTML = `<p>$(text)</p>`;
-    setTimeout(()=>{
-        feedback.classList.remove('showItem');
-    },3000);
-}
-getRestaurants(restaurants){
-    if(restaurants.length === 0){
-        this.showFeedback(`no such categories exist in the selected city`)
+        })
+        search.innerHTML = output;
     }
-    else{
-        this.restaurantList.innerHTML = '';
-        restaurants.forEach((restaurant) =>{
-            const {thumb:img,name,location:{address},user_rating:{aggregate_rating},cuisines,average_cost_for_two:cost,menu_url,url} = 
-            restaurant.restaurant;
-    if(img !== ''){
-        this.showRestaurant(img,name,address,aggregate_rating,cuisines,cost, menu_url,url)
+    showFeedback(text) {
+        const feedback = document.querySelector('.feedback');
+        feedback.classList.add('showItem');
+        feedback.innerHTML = `<p>$(text)</p>`;
+        setTimeout(() => {
+            feedback.classList.remove('showItem');
+        }, 3000);
     }
-})
+    getRestaurants(restaurants) {
+        if (restaurants.length === 0) {
+            this.showFeedback(`no such categories exist in the selected city`)
+        }
+        else {
+            this.restaurantList.innerHTML = '';
+            restaurants.forEach((restaurant) => {
+                const { thumb: img, name, location: { address }, user_rating: { aggregate_rating }, cuisines, average_cost_for_two: cost, menu_url, url } =
+                    restaurant.restaurant;
+                if (img !== '') {
+                    this.showRestaurant(img, name, address, aggregate_rating, cuisines, cost, menu_url, url)
+                }
+            })
+        }
     }
-}
-showRestaurant(img,name,address,aggregate_rating,cuisines,cost,menu_url,url)
-    {
+    showRestaurant(img, name, address, aggregate_rating, cuisines, cost, menu_url, url) {
         const div = document.createElement('div');
-        div.classList.add('col-11','mx-auto','my-3','col-md-4');
+        div.classList.add('col-11', 'mx-auto', 'my-3', 'col-md-4');
 
-        div.innerHTML= `<div class="card">
+        div.innerHTML = `<div class="card">
         <div class="card">
          <div class="row p-3">
           <div class="col-5">
@@ -126,44 +130,50 @@ showRestaurant(img,name,address,aggregate_rating,cuisines,cost,menu_url,url)
         </div>`;
         this.restaurantList.appendChild(div);
     }
+    showSnapshot(restaurants){
+        // do the aggregation in this function, adapt the html template from the function above.
+        console.log("showSnapshot called");
+        console.log(restaurants);
     }
-(function(){
-const searchForm = document.getElementById('searchForm');
-const searchCity = document.getElementById('searchCity');
-const searchCategory = document.getElementById('searchCategory');
-
-const zomato = new ZOMATO();
-
-const ui = new UI();
-
-//add select options
-document.addEventListener('DOMContentLoaded',()=>{
-    //logic goes here
-    zomato.searchAPI().then(data => ui.addSelectOptions(data.categories));
-});
-
-//sumbit form
-searchForm.addEventListener('submit',event => {
-    event.preventDefault();
-
-    const city = searchCity.value.toLowerCase(); 
-    const categoryID = parseInt(searchCategory.value);
-
-if(city === '' || categoryID === 0){
-    ui.showFeedback('please enter a city and select category');
-} else{
-    //logic goes here
-    zomato.searchAPI(city).then(cityData =>{
-    if(cityData.cityID === 0) {
-        ui.showFeedback('please enter a valid city!')
-    }
-    else{
-        zomato.searchAPI(city,categoryID).then(data => {
-            ui.getRestaurants(data.restaurants);
-        });
-    }
-    });
 }
+(function () {
+    const searchForm = document.getElementById('searchForm');
+    const searchCity = document.getElementById('searchCity');
+    const searchCategory = document.getElementById('searchCategory');
 
-});
+    const zomato = new ZOMATO();
+
+    const ui = new UI();
+
+    //add select options
+    document.addEventListener('DOMContentLoaded', () => {
+        //logic goes here
+        zomato.searchAPI().then(data => ui.addSelectOptions(data.categories));
+    });
+
+    //sumbit form
+    searchForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const city = searchCity.value.toLowerCase();
+        const categoryID = parseInt(searchCategory.value);
+
+        if (city === '' || categoryID === 0) {
+            ui.showFeedback('please enter a city and select category');
+        } else {
+            //logic goes here
+            zomato.searchAPI(city).then(cityData => {
+                if (cityData.cityID === 0) {
+                    ui.showFeedback('please enter a valid city!')
+                }
+                else {
+                    zomato.searchAPI(city, categoryID).then(data => {
+                        ui.showSnapshot(data.restaurants);
+                        // ui.getRestaurants(data.restaurants);
+                    });
+                }
+            });
+        }
+
+    });
 })();
