@@ -369,7 +369,7 @@ function genSubCardTmEvent(event) {
 
 function genCardTicketmaster(location) {
     $("#row-tm-card").remove(); // clear whole row of flickr if it exists.
-    let imgCard = setupCard("tm-card", "What's happening");
+    let imgCard = setupCard("tm-card", "Events");
     imgCard.appendTo($(".container"));
 
     const searchTerm = location;
