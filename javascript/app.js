@@ -2,6 +2,7 @@
 const flickrKey = "75984158462bb7bd30c44a252e48dc5c";
 const flickrSecret = "0439aa99b145fd15";
 const flickrImgSize = 240;
+const flickrBaseUrl = 'https://api.flickr.com/services/rest/?';
 // ---- flickr setup end ----
 
 // ---- zomato setup start ----
@@ -57,7 +58,6 @@ class ZOMATO {
         };
     }
 }
-
 class UI {
     constructor() {
         // this.restaurantList = document.getElementById('restaurant-list');
@@ -207,10 +207,20 @@ class UI {
 }
 // ---- zomato setup end ----
 
+// ---- ticketmaster setup start ----
+const ticketmasterKey = "61OGUmlj7VACAPXGP45VdTLRzFc9XNrx";
+const ticketmasterSecret = "esQ3Y2ZKbui9qBeW";
+const ticketmasterBaseUrl = "https://app.ticketmaster.com/discovery/v2/events.json?";
+// ---- ticketmaster setup end ----
 
 // utility function for flickr API call, returns full query url
 function retUrl(params) {
     const baseUrl = 'https://api.flickr.com/services/rest/?';
+    return baseUrl + Object.keys(params).map(key => key + '=' + params[key]).join('&');
+}
+
+function retTicketMasterUrl(params) {
+    const baseUrl = "https://app.ticketmaster.com/discovery/v2/events.json?";
     return baseUrl + Object.keys(params).map(key => key + '=' + params[key]).join('&');
 }
 
@@ -323,6 +333,69 @@ function genCardZomato(location) {
     });
 }
 
+function genCardTicketmaster(location){
+    $("#row-tm-card").remove(); // clear whole row of flickr if it exists.
+    let imgCard = setupCard("tm-card", "What's happening");
+    imgCard.appendTo($(".container"));
+
+    const searchTerm = location;
+
+    const params = {
+        keyword: searchTerm,
+        size: 10,
+        api_key: ticketmasterKey
+    };
+
+    const queryUrl = retTicketMasterUrl(params);
+    console.log(queryUrl);
+
+    const response =
+        $.ajax({
+            type: "GET",
+            url: "https://app.ticketmaster.com/discovery/v2/events.json?keyword=" + searchTerm + "&size=10&apikey=61OGUmlj7VACAPXGP45VdTLRzFc9XNrx",
+            async: true,
+            dataType: "json",
+            success: function (json) {
+                console.log(json);
+                const events = json._embedded.events;
+                const event = events[0];
+                console.log(event);
+
+                // const rowTix = setupCard('tm-card', "What's happening");
+                // rowTix.appendTo($("#results"));
+                
+                // // one card per event
+                // const eventCard = $("<div>")
+                //     .addClass("card")
+                //     .attr("id", "event-card");
+
+                $('<p><a href="' + event.url + '" target="_blank">' + event.name + '</a></p>')
+                    .appendTo($("#tm-card .card-body"));
+                // console.log(events[0].outlets[0].url);
+                // console.log(events[0].url);
+
+                $("<img>")
+                    .addClass("ticketmaster-img")
+                    .attr("src", event.images[1].url) // note image size selection here
+                    .appendTo("#tm-card .card-body");
+
+                const genre = event.classifications[0].genre.name + ' - ' +
+                    event.classifications[0].segment.name + ' - ' +
+                    event.classifications[0].subGenre.name;
+                $("<p>")
+                    .text("What: " + genre)
+                    .appendTo($("#tm-card .card-body"));
+
+                const date_time = event.dates.start.localDate + ' ' +
+                    event.dates.start.localTime;
+                $("<p>")
+                    .text("When: " + date_time)
+                    .appendTo($("#tm-card .card-body"));
+            },
+            error: function (xhr, status, err) { }
+        });
+}
+
 $("#submit-query").on("click", function (event) {
     // init setup, get user input
     event.preventDefault();
@@ -332,6 +405,7 @@ $("#submit-query").on("click", function (event) {
 
     genCardFlickr(location);
     genCardZomato(location);
+    genCardTicketmaster(location);
 
 });
 
