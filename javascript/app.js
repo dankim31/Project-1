@@ -305,7 +305,7 @@ function genCardFlickr(location) {
     });
 }
 
-function genCardZomato(location) {
+function genCardZomato(location, budget) {
     $("#row-zomato-card").remove(); // clear whole row of flickr if it exists.
     let imgCard = setupCard("zomato-card", "Eatery");
     imgCard.appendTo($(".container"));
@@ -321,9 +321,16 @@ function genCardZomato(location) {
     //     .getElementsByClassName('card-body');
     // console.log(temp);
     zomato.searchAPI(city, categoryID).then(data => {
-        ui.getRestaurants(data.restaurants.splice(0, 3));
         const avgCost = ui.calcAvgCost(data.restaurants);
+        const meals = Math.floor(budget / avgCost);
+        const msg = "Your budget affords " + meals +
+            " meals on average in " + location +
+            " for two people. Don't Starve.";
+        $("<p>")
+            .text(msg)
+            .appendTo($("#zomato-card .card-body"));
         // $("#zomato-card .card-body").text(avgCost);
+        ui.getRestaurants(data.restaurants.splice(0, 3));
     });
 }
 
@@ -404,7 +411,7 @@ $("#submit-query").on("click", function (event) {
     console.log('submit clicked', location, budget);
 
     genCardFlickr(location);
-    genCardZomato(location);
+    genCardZomato(location, budget);
     genCardTicketmaster(location);
 
 });
