@@ -105,7 +105,7 @@ class UI {
     }
     showRestaurant(img, name, address, aggregate_rating, cuisines, cost, menu_url, url) {
         const div = document.createElement('div');
-        div.classList.add('col-lg-3', 'mx-auto', 'my-3', 'col-md-4', 'col-sm-8'); //'mx-auto'
+        div.classList.add('col-lg-4', 'mx-auto', 'my-3', 'col-md-6', 'col-sm-12'); //'mx-auto'
 
         div.innerHTML = `
         <div class="card">
